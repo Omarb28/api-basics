@@ -3,11 +3,11 @@ from sqlalchemy import Column, String, Integer, Boolean, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-#database_name = "bookshelf"
-#database_path = "postgres://{}:{}@{}/{}".format('student', 'student','localhost:5432', database_name)
-
-database_name = "plants"
+database_name = "bookshelf"
 database_path = "postgres://{}:{}@{}/{}".format('vagrant', 'vagrant','localhost:5432', database_name)
+
+#database_name = "plants"
+#database_path = "postgres://{}:{}@{}/{}".format('vagrant', 'vagrant','localhost:5432', database_name)
 
 db = SQLAlchemy()
 

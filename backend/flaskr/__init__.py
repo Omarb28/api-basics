@@ -1,10 +1,10 @@
-import os
+import os, sys
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy #, or_
 from flask_cors import CORS
 import random
 
-from models import setup_db, Book
+from models import setup_db, Book, db
 
 BOOKS_PER_SHELF = 8
 
@@ -27,7 +27,7 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-  # @TODO: Write a route that retrivies all books, paginated. 
+  # @DONE: Write a route that retrivies all books, paginated. 
   #         You can use the constant above to paginate by eight books.
   #         If you decide to change the number of books per page,
   #         update the frontend to handle additional books in the styling and pagination
@@ -37,7 +37,7 @@ def create_app(test_config=None):
   def get_books():
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * BOOKS_PER_SHELF
-    books = Book.query.offset(start).limit(BOOKS_PER_SHELF).all()
+    books = Book.query.order_by(Book.title).offset(start).limit(BOOKS_PER_SHELF).all()
     formatted_books = [book.format() for book in books]
     total_books = Book.query.count()
 
@@ -47,14 +47,39 @@ def create_app(test_config=None):
       'total_books': total_books
     })
 
-  
-
-  # @TODO: Write a route that will update a single book's rating. 
+  # @DONE: Write a route that will update a single book's rating. 
   #         It should only be able to update the rating, not the entire representation
   #         and should follow API design principles regarding method and route.  
   #         Response body keys: 'success'
   # TEST: When completed, you will be able to click on stars to update a book's rating and it will persist after refresh
-
+  @app.route('/books/<int:book_id>', methods=['PATCH'])
+  def update_book_rating(book_id):
+    error = False
+    try:
+      book = Book.query.get(book_id)
+      rating = request.get_json().get('rating')
+      
+      if book is None or rating is None:
+        return abort(404)
+      
+      if rating > 5 or rating < 0:
+        return abort(305)
+      
+      book.rating = rating
+      book.update()
+    except:
+      error = True
+      db.session.rollback()
+      print(sys.exc_info())
+    finally:
+      db.session.close()
+    
+    if error:
+      return abort(500)
+    else:
+      return jsonify({
+        'success': True
+      })
 
   # @TODO: Write a route that will delete a single book. 
   #        Response body keys: 'success', 'deleted'(id of deleted book), 'books' and 'total_books'
