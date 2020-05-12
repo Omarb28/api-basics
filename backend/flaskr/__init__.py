@@ -1,7 +1,7 @@
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy #, or_
 from flask_cors import CORS
-import random
+import unittest
 
 from models import setup_db, Book
 
@@ -50,6 +50,9 @@ def create_app(test_config=None):
   def update_book(book_id):
 
     body = request.get_json()
+    
+    if body is None:
+      abort(400)
 
     try:
       book = Book.query.filter(Book.id == book_id).one_or_none()
@@ -94,6 +97,9 @@ def create_app(test_config=None):
   def create_book():
     body = request.get_json()
 
+    if body is None:
+      abort(400)
+
     new_title = body.get('title', None)
     new_author = body.get('author', None)
     new_rating = body.get('rating', None)
@@ -123,6 +129,38 @@ def create_app(test_config=None):
   # TEST: Practice writing curl requests. Write some requests that you know will error in expected ways.
   #       Make sure they are returning as expected. Do the same for other misformatted requests or requests missing data.
   #       If you find any error responses returning as HTML, write new error handlers for them. 
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      'success': False,
+      'error': 400,
+      'message': 'Bad Request'
+    }), 400
+
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+      'success': False,
+      'error': 404,
+      'message': 'Not Found'
+    }), 404
+
+  @app.errorhandler(405)
+  def not_allowed(error):
+    return jsonify({
+      'success': False,
+      'error': 404,
+      'message': 'Method Not Allowed'
+    }), 405
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return jsonify({
+      'success': False,
+      'error': 422,
+      'message': 'Unprocessable Entity'
+    }), 422
+
 
   return app
 
