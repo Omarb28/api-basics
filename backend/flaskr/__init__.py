@@ -8,7 +8,14 @@ from models import setup_db, Book, db
 
 BOOKS_PER_SHELF = 8
 
-# @TODO: General Instructions
+def paginate_books(request):
+  page = request.args.get('page', 1, type=int)
+  start = (page - 1) * BOOKS_PER_SHELF
+  books = Book.query.order_by(Book.title).offset(start).limit(BOOKS_PER_SHELF).all()
+  formatted_books = [book.format() for book in books]
+  return formatted_books
+  
+# @DONE: General Instructions
 #   - As you're creating endpoints, define them and then search for 'TODO' within the frontend to update the endpoints there. 
 #     If you do not update the endpoints, the lab will not work - of no fault of your API code! 
 #   - Make sure for each route that you're thinking through when to abort and with which kind of error 
@@ -35,15 +42,17 @@ def create_app(test_config=None):
   # TEST: When completed, the webpage will display books including title, author, and rating shown as stars
   @app.route('/books')
   def get_books():
-    page = request.args.get('page', 1, type=int)
-    start = (page - 1) * BOOKS_PER_SHELF
-    books = Book.query.order_by(Book.title).offset(start).limit(BOOKS_PER_SHELF).all()
-    formatted_books = [book.format() for book in books]
+
+    current_books = paginate_books(request)
+
+    if len(current_books) == 0:
+      return abort(404)
+
     total_books = Book.query.count()
 
     return jsonify({
       'success': True,
-      'books': formatted_books,
+      'books': current_books,
       'total_books': total_books
     })
 
@@ -52,34 +61,36 @@ def create_app(test_config=None):
   #         and should follow API design principles regarding method and route.  
   #         Response body keys: 'success'
   # TEST: When completed, you will be able to click on stars to update a book's rating and it will persist after refresh
+  #
+  # curl localhost:5000/books/8 -X Patch -H "Content-Type: application/json" -d '{"rating": 5}' 
   @app.route('/books/<int:book_id>', methods=['PATCH'])
   def update_book_rating(book_id):
-    error = False
     try:
       book = Book.query.get(book_id)
-      rating = request.get_json().get('rating')
-      
-      if book is None or rating is None:
+      body = request.get_json()
+
+      if book is None:
         return abort(404)
+
+      if 'rating' in body:
+        rating = int(body.get('rating'))
+        if rating > 5 or rating < 0:
+          return abort(305)
+
+        book.rating = rating
       
-      if rating > 5 or rating < 0:
-        return abort(305)
-      
-      book.rating = rating
       book.update()
+
+      return jsonify({
+        'success': True,
+        'id': book_id
+      })
     except:
-      error = True
       db.session.rollback()
       print(sys.exc_info())
+      return abort(400)
     finally:
       db.session.close()
-    
-    if error:
-      return abort(500)
-    else:
-      return jsonify({
-        'success': True
-      })
 
   # @DONE: Write a route that will delete a single book. 
   #        Response body keys: 'success', 'deleted'(id of deleted book), 'books' and 'total_books'
@@ -88,7 +99,6 @@ def create_app(test_config=None):
   # TEST: When completed, you will be able to delete a single book by clicking on the trashcan.
   @app.route('/books/<int:book_id>', methods=['DELETE'])
   def delete_book(book_id):
-    error = False
     try:
       book = Book.query.get(book_id)
 
@@ -96,20 +106,19 @@ def create_app(test_config=None):
         return abort(404)
 
       book.delete()
+
+      return jsonify({
+        'success': True,
+        'deleted': book_id,
+        'books': paginate_books(request),
+        'total_books': Book.query.count()
+      })
     except:
-      error = True
       db.session.rollback()
       print(sys.exc_info())
+      return abort(422)
     finally:
       db.session.close()
-    
-    if error:
-      return abort(500)
-    else:
-      return jsonify({
-        'success': True
-      })
-
 
   # @DONE: Write a route that create a new book. 
   #        Response body keys: 'success', 'created'(id of created book), 'books' and 'total_books'
@@ -117,32 +126,43 @@ def create_app(test_config=None):
   #       Your new book should show up immediately after you submit it at the end of the page. 
   @app.route('/books', methods=['POST'])
   def create_book():
-    error = False
+    body = request.get_json()
+
+    new_title = body.get('title', None)
+    new_author = body.get('author', None)
+    new_rating = body.get('rating', None)
+
     try:
-      data = request.get_json()
-
-      book = Book(
-        title = data.get('title'),
-        author = data.get('author'),
-        rating = data.get('rating')
-      )
-
+      book = Book(title=new_title, author=new_author, rating=int(new_rating))
       book.insert()
-    except:
-      error = True
-      db.session.rollback()
-      print(sys.exc_info())
-    finally:
-      db.session.close()
-    
-    if error:
-      return abort(500)
-    else:
+
+      current_books = paginate_books(request)
+
       return jsonify({
-        'success': True
+        'success': True,
+        'created': book.id,
+        'books': current_books,
+        'total_books': Book.query.count()
       })
 
+    except:
+      db.session.rollback()
+      print(sys.exc_info())
+      return abort(422)
+    finally:
+      db.session.close()
+      
   
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+        "success": False, 
+        "error": 404,
+        "message": "Not found"
+        }), 404
+
+        
+
   return app
 
     
