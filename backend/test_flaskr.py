@@ -39,13 +39,22 @@ class BookTestCase(unittest.TestCase):
 #        Such as adding a book without a rating, etc. 
 #        Since there are four routes currently, you should have at least eight tests. 
 # Optional: Update the book information in setUp to make the test database your own! 
-    def test_retrieve_books(self):
+    def test_get_paginated_books(self):
       res = self.client().get('/books')
+      data = json.loads(res.data)
+
       self.assertEqual(res.status_code, 200)
+      self.assertEqual(data['success'], True)
+      self.assertEqual(data['total_books'])
+      self.assertEqual(len(data['books']))
       
-    def test_retrieve_books_fail(self):
-      res = self.client().get('/books?page=400')
+    def test_404_sent_requesting_beyond_valid_page(self):
+      res = self.client().get('/books?page=1000', json={'rating': 1})
+      data = json.loads(res.data)
+
       self.assertEqual(res.status_code, 404)
+      self.assertEqual(data['success'], False)
+      self.assertEqual(data['message'], 'resource not found')
 
     def test_create_book(self):
       data = {
