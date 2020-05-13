@@ -41,48 +41,61 @@ class BookTestCase(unittest.TestCase):
 # Optional: Update the book information in setUp to make the test database your own! 
     def test_get_paginated_books(self):
       res = self.client().get('/books')
-      data = json.loads(res.data)
+      data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 200)
       self.assertEqual(data['success'], True)
-      self.assertEqual(data['total_books'])
-      self.assertEqual(len(data['books']))
+      self.assertTrue(data['total_books'])
+      self.assertTrue(len(data['books']))
       
     def test_404_sent_requesting_beyond_valid_page(self):
       res = self.client().get('/books?page=1000', json={'rating': 1})
-      data = json.loads(res.data)
+      data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 404)
       self.assertEqual(data['success'], False)
-      self.assertEqual(data['message'], 'resource not found')
-
-    def test_create_book(self):
-      data = {
-        'author': 'Test Author',
-        'title': 'Test Book',
-        'rating': 5
-      }
-      res = self.client().post('/books', data=data)
-      self.assertEqual(res.status_code, 200)
-
-    def test_create_book_fail(self):
-      res = self.client().post('/books')
-      self.assertEqual(res.status_code, 400)
+      self.assertEqual(data['message'], 'Not Found')
 
     def test_update_book_rating(self):
-      data = {'rating': 0}
-      res = self.client().patch('/books/1', data=data)
+      rating = {'rating': 1}
+      res = self.client().patch('/books/5', json=rating)
+      data = json.loads(res.data.decode('utf-8'))
+      book = Book.query.get(5)
+      
       self.assertEqual(res.status_code, 200)
+      self.assertEqual(data['success'], True)
+      self.assertEqual(book.format()['rating'], 1)
 
     def test_update_book_rating_fail(self):
-      res = self.client().patch('/books/1')
+      res = self.client().patch('/books/5')
+      data = json.loads(res.data.decode('utf-8'))
+
       self.assertEqual(res.status_code, 400)
+      self.assertEqual(data['success'], False)
+      self.assertEqual(data['message'], 'Bad Request')
 
     def test_delete_book(self):
       pass
 
     def test_delete_book_fail(self):
       pass
+
+    def test_create_book(self):
+      book = {
+        'author': 'Test Author',
+        'title': 'Test Book',
+        'rating': 5
+      }
+      res = self.client().post('/books', json=book)
+      data = json.loads(res.data.decode('utf-8'))
+
+      self.assertEqual(res.status_code, 200)
+      self.assertTrue(data['total_books'])
+      self.assertTrue(len(data['books']))
+
+    def test_create_book_fail(self):
+      res = self.client().post('/books')
+      self.assertEqual(res.status_code, 400)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
