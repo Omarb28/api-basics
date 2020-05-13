@@ -75,27 +75,44 @@ class BookTestCase(unittest.TestCase):
       self.assertEqual(data['message'], 'Bad Request')
 
     def test_delete_book(self):
-      pass
+      book_id = 2
+      res = self.client().delete('/books/' + str(book_id))
+      data = json.loads(res.data.decode('utf-8'))
 
-    def test_delete_book_fail(self):
-      pass
+      book = Book.query.get(book_id)
+
+      self.assertEqual(res.status_code, 200)
+      self.assertEqual(data['success'], True)
+      self.assertEqual(data['deleted'], book_id)
+      self.assertTrue(data['total_books'])
+      self.assertTrue(len(data['books']))
+      self.assertEqual(book, None)
+
+    def test_404_if_book_does_not_exist(self):
+      res = self.client().delete('/books/1000')
+      data = json.loads(res.data.decode('utf-8'))
+
+      self.assertEqual(res.status_code, 422)
+      self.assertEqual(data['success'], False)
+      self.assertEqual(data['message'], 'Unprocessable Entity')
 
     def test_create_book(self):
-      book = {
-        'author': 'Test Author',
-        'title': 'Test Book',
-        'rating': 5
-      }
-      res = self.client().post('/books', json=book)
+      res = self.client().post('/books', json=self.new_book)
       data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 200)
-      self.assertTrue(data['total_books'])
+      self.assertEqual(data['success'], True)
+      self.assertTrue(data['created'])
       self.assertTrue(len(data['books']))
 
-    def test_create_book_fail(self):
-      res = self.client().post('/books')
-      self.assertEqual(res.status_code, 400)
+    def test_405_if_book_creation_not_allowed(self):
+      res = self.client().post('/books/45', json=self.new_book)
+      data = json.loads(res.data.decode('utf-8'))
+      
+      self.assertEqual(res.status_code, 405)
+      self.assertEqual(data['success'], False)
+      self.assertEqual(data['message'], 'Method Not Allowed')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
