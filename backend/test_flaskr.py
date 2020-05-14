@@ -56,6 +56,26 @@ class BookTestCase(unittest.TestCase):
       self.assertEqual(data['success'], False)
       self.assertEqual(data['message'], 'Not Found')
 
+    # @TODO: Write tests for search - at minimum two
+    #        that check a response when there are results and when there are none
+    def test_search_for_a_book(self):
+      res = self.client().post('/books/search', json={'search': 'Anansi Boys'})
+      data = json.loads(res.data.decode('utf-8'))
+
+      self.assertEqual(res.status_code, 200)
+      self.assertTrue(data['total_books'])
+      self.assertTrue(len(data['books']))
+
+    def test_404_no_books_found_for_search_term(self):
+      res = self.client().post('/books/search', json={'search': 'EWORIUHEWIFOSDNFQUIEWR'})
+      data = json.loads(res.data.decode('utf-8'))
+
+      self.assertEqual(res.status_code, 404)
+      self.assertEqual(data['message'], 'Not Found')
+      self.assertTrue(data['total_books'])
+      self.assertEqual(len(data['books']), 0)
+
+
     def test_update_book_rating(self):
       rating = {'rating': 1}
       res = self.client().patch('/books/5', json=rating)
@@ -74,6 +94,7 @@ class BookTestCase(unittest.TestCase):
       self.assertEqual(data['success'], False)
       self.assertEqual(data['message'], 'Bad Request')
 
+    '''
     def test_delete_book(self):
       book_id = 2
       res = self.client().delete('/books/' + str(book_id))
@@ -87,7 +108,7 @@ class BookTestCase(unittest.TestCase):
       self.assertTrue(data['total_books'])
       self.assertTrue(len(data['books']))
       self.assertEqual(book, None)
-
+    '''
     def test_404_if_book_does_not_exist(self):
       res = self.client().delete('/books/1000')
       data = json.loads(res.data.decode('utf-8'))

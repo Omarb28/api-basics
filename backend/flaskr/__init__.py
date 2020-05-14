@@ -121,10 +121,19 @@ def create_app(test_config=None):
     except:
       abort(422)
 
-  # @TODO: Review the above code for route handlers. 
+  # @TODO: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
+  #        the body argument is called 'search' coming from the frontend. 
+  #        If you use a different argument, make sure to update it in the frontend code. 
+  #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term
+  #        Response body keys: 'success', 'books' and 'total_books'
+  
+
+
+
+  # @Done: Review the above code for route handlers. 
   #        Pay special attention to the status codes used in the aborts since those are relevant for this task! 
 
-  # @TODO: Write error handler decorators to handle AT LEAST status codes 400, 404, and 422. 
+  # @Done: Write error handler decorators to handle AT LEAST status codes 400, 404, and 422. 
     
   # TEST: Practice writing curl requests. Write some requests that you know will error in expected ways.
   #       Make sure they are returning as expected. Do the same for other misformatted requests or requests missing data.
