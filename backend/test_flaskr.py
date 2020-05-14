@@ -58,24 +58,26 @@ class BookTestCase(unittest.TestCase):
 
     # @TODO: Write tests for search - at minimum two
     #        that check a response when there are results and when there are none
-    def test_search_for_a_book(self):
-      res = self.client().post('/books/search', json={'search': 'Anansi Boys'})
+    def test_get_book_search_with_results(self):
+      res = self.client().post('/books/search', json={'search': 'Novel'})
       data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 200)
+      self.assertEqual(data['success'], True)
       self.assertTrue(data['total_books'])
-      self.assertTrue(len(data['books']))
+      self.assertEqual(len(data['books']), 2)
 
-    def test_404_no_books_found_for_search_term(self):
+    def test_get_book_search_withouth_results(self):
       res = self.client().post('/books/search', json={'search': 'EWORIUHEWIFOSDNFQUIEWR'})
       data = json.loads(res.data.decode('utf-8'))
 
-      self.assertEqual(res.status_code, 404)
-      self.assertEqual(data['success'], False)
-      self.assertEqual(data['message'], 'Not Found')
+      self.assertEqual(res.status_code, 200)
+      self.assertEqual(data['success'], True)
+      self.assertEqual(data['total_books'], 0)
+      self.assertEqual(len(data['books']), 0)
 
     def test_400_no_search_term_provided(self):
-      res = self.client().post('/books/search')
+      res = self.client().post('/books/search', json={'rating': 2})
       data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 400)
