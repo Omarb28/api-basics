@@ -87,7 +87,7 @@ def create_app(test_config=None):
         'success': True,
         'deleted': book_id,
         'books': current_books,
-        'total_books': len(Book.query.all())
+        'total_books': Book.query.count()
       })
 
     except:
@@ -115,7 +115,7 @@ def create_app(test_config=None):
         'success': True,
         'created': book.id,
         'books': current_books,
-        'total_books': len(Book.query.all())
+        'total_books': Book.query.count()
       })
 
     except:
@@ -126,9 +126,27 @@ def create_app(test_config=None):
   #        If you use a different argument, make sure to update it in the frontend code. 
   #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term
   #        Response body keys: 'success', 'books' and 'total_books'
-  
+  @app.route('/books/search', methods=['POST'])
+  def search_book():
+    body = request.get_json()
 
+    if body is None or body['search'] is None:
+      abort(400)
 
+    search_term = body['search']
+
+    books = Book.query.filter(Book.title.ilike('%' + search_term + '%')).all()
+    
+    if len(books) == 0:
+      abort(404)
+
+    formatted_books = [book.format() for book in books]
+    
+    return jsonify({
+      'success': True,
+      'books': formatted_books,
+      'total_books': len(books)
+    })
 
   # @Done: Review the above code for route handlers. 
   #        Pay special attention to the status codes used in the aborts since those are relevant for this task! 

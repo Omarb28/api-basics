@@ -71,10 +71,16 @@ class BookTestCase(unittest.TestCase):
       data = json.loads(res.data.decode('utf-8'))
 
       self.assertEqual(res.status_code, 404)
+      self.assertEqual(data['success'], False)
       self.assertEqual(data['message'], 'Not Found')
-      self.assertTrue(data['total_books'])
-      self.assertEqual(len(data['books']), 0)
 
+    def test_400_no_search_term_provided(self):
+      res = self.client().post('/books/search')
+      data = json.loads(res.data.decode('utf-8'))
+
+      self.assertEqual(res.status_code, 400)
+      self.assertEqual(data['success'], False)
+      self.assertEqual(data['message'], 'Bad Request')
 
     def test_update_book_rating(self):
       rating = {'rating': 1}
