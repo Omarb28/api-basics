@@ -130,15 +130,12 @@ def create_app(test_config=None):
   def search_book():
     body = request.get_json()
 
-    if body is None or body['search'] is None:
+    if body is None or 'search' not in body:
       abort(400)
 
     search_term = body['search']
 
     books = Book.query.filter(Book.title.ilike('%' + search_term + '%')).all()
-    
-    if len(books) == 0:
-      abort(404)
 
     formatted_books = [book.format() for book in books]
     
