@@ -73,12 +73,13 @@ Through the books API you could create, list, and delete the books. Togeether wi
 
 You can access all books through this endpoint:
 ```
-GET   http://127.0.0.1/books
+GET   http://127.0.0.1:5000/books
 ```
+
 
 You can create a book using the following end point:
 ```
-POST  http://127.0.0.1/books
+POST  http://127.0.0.1:5000/books
 ```
 The JSON formatted data expected to create a book is:
 ```
@@ -90,6 +91,23 @@ The JSON formatted data expected to create a book is:
 ```
 The rating should be between 1-5 stars.
 
+
+You can update a book's rating using the following appraoch which expects an ID at the end of the endpoint:
+```
+PATCH   http://127.0.0.1:5000/books/5
+```
+The JSON formatted data expected is:
+```
+{
+  "rating": 3
+}
+```
+
+
+You can delete a book using the following apprach which expects an ID at the end of the endpoint:
+```
+DELETE   http://127.0.0.1:5000/books/5
+```
 
 
 
