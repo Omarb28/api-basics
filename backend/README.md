@@ -73,8 +73,22 @@ Through the books API you could create, list, and delete the books. Togeether wi
 
 You can access all books through this endpoint:
 ```
-http://127.0.0.1/books
+GET   http://127.0.0.1/books
 ```
+
+You can create a book using the following end point:
+```
+POST  http://127.0.0.1/books
+```
+The JSON formatted data expected to create a book is:
+```
+{
+  "title": "Book Titile",
+  "author": "Author's Name",
+  "rating": 4
+}
+```
+The rating should be between 1-5 stars.
 
 
 
