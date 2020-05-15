@@ -54,13 +54,33 @@ The `--reload` flag will detect file changes and restart the server automaticall
 
 ## API Reference
 
+#### Base URL
+
+The base url for the books is accessed at:
+```
+http://127.0.0.1/books
+```
+
+#### API Keys / Authentication
+
+Not yet included
+
 ### Introduction
 
-### Getting Started
-
-### Errors
+Through the books API you could create, list, and delete the books. Togeether with the ability to change the rating on the books as shown below.
 
 ### Resource Endpoint Library
+
+You can access all books through this endpoint:
+```
+http://127.0.0.1/books
+```
+
+
+
+
+### Error Handling
+
 
 <!--
 ## Tasks
