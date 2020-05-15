@@ -1,4 +1,8 @@
-# Full Stack Trivia API Backend
+# The Great Bookshelf of Udacity Backend API
+
+## Introduction
+
+This is the backend API for the Great Bookshelf of Udacity. The API provides endpoints for various methods on the books that are stored there, as explained below.
 
 ## Getting Started
 
@@ -33,7 +37,7 @@ This will install all of the required packages we selected within the `requireme
 ## Database Setup
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
 ```bash
-psql trivia < trivia.psql
+psql bookshelf < books.psql
 ```
 
 ## Running the server
@@ -48,6 +52,17 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
+## API Reference
+
+### Introduction
+
+### Getting Started
+
+### Errors
+
+### Resource Endpoint Library
+
+<!--
 ## Tasks
 
 One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
@@ -84,13 +99,13 @@ GET '/api/v1.0/categories'
 '6' : "Sports"}
 
 ```
-
+-->
 
 ## Testing
 To run the tests, run
 ```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
+dropdb bookshelf_test
+createdb bookshelf_test
+psql bookshelf_test < books.psql
 python test_flaskr.py
 ```
