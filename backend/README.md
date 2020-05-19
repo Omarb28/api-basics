@@ -124,6 +124,15 @@ You'll get error 400 when a bad request has been sent to the server, as follows:
 }
 
 ```
+
+You'll get error 404 when a book has not been found, as follows:
+```
+{
+  "success": False,
+  "error": 404,
+  "message": "Not Found"
+}
+```
 <!--
 ## Tasks
 
