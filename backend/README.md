@@ -84,7 +84,7 @@ POST  http://127.0.0.1:5000/books
 The JSON formatted data expected to create a book is:
 ```
 {
-  "title": "Book Titile",
+  "title": "Book Title",
   "author": "Author's Name",
   "rating": 4
 }
@@ -113,7 +113,17 @@ DELETE   http://127.0.0.1:5000/books/5
 
 ### Error Handling
 
+This section will show which errors you might get if something goes wrong:
 
+You'll get error 400 when a bad request has been sent to the server, as follows:
+```
+{
+  "success": False,
+  "error": 400,
+  "message": "Bad Request"
+}
+
+```
 <!--
 ## Tasks
 
