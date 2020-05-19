@@ -142,6 +142,15 @@ You'll get error 405 when a method used on an endpoint is not allowed, as follow
   "message": "Method Not Allowed"
 }
 ```
+
+You'll get error 422 unprocessable entity when a request to create or edit a book doesn't meet all the criterea, as follows:
+```
+{
+  "success": False,
+  "error": 422,
+  "message": "Unprocessable Entity"
+}
+```
 <!--
 ## Tasks
 
