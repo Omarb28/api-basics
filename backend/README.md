@@ -133,6 +133,15 @@ You'll get error 404 when a book has not been found, as follows:
   "message": "Not Found"
 }
 ```
+
+You'll get error 405 when a method used on an endpoint is not allowed, as follows:
+```
+{
+  "success": False,
+  "error": 405,
+  "message": "Method Not Allowed"
+}
+```
 <!--
 ## Tasks
 
